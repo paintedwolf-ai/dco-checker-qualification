@@ -28,5 +28,23 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 15
     steps:
+      - name: Record disposable qualification event
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python3 - <<'PY_EVENT'
+          import json, os, urllib.request
+          event = json.load(open(os.environ["GITHUB_EVENT_PATH"]))
+          print("DCO_QUALIFICATION_EVENT=" + json.dumps(event, sort_keys=True))
+          if os.environ["GITHUB_EVENT_NAME"] == "merge_group":
+              owner, name = os.environ["GITHUB_REPOSITORY"].split("/")
+              ref = event["merge_group"]["base_ref"]
+              branch = ref.removeprefix("refs/heads/")
+              query = "query($owner:String!,$name:String!,$ref:String!,$branch:String!){repository(owner:$owner,name:$name){baseRef:ref(qualifiedName:$ref){target{...on Commit{oid}}}mergeQueue(branch:$branch){entries(first:100){totalCount pageInfo{hasNextPage endCursor}nodes{id baseCommit{oid}headCommit{oid}pullRequest{number state isDraft baseRefName baseRefOid headRefOid}}}}}}"
+              request = urllib.request.Request("https://api.github.com/graphql", data=json.dumps({"query":query,"variables":{"owner":owner,"name":name,"ref":ref,"branch":branch}}).encode(), headers={"Authorization":"Bearer " + os.environ["GH_TOKEN"],"Accept":"application/vnd.github+json"})
+              with urllib.request.urlopen(request, timeout=20) as response:
+                  inventory = json.load(response)
+              print("DCO_QUALIFICATION_QUEUE=" + json.dumps(inventory, sort_keys=True))
+          PY_EVENT
       - name: Certify original PR commits
-        uses: paintedwolf-ai/dco-checker@7a0e11d8cf7d46d946bd151b99c234cc71431eef
+        uses: paintedwolf-ai/dco-checker@76373c28e004ca4d2b9728bcbcecf87c4cc262fb
