@@ -17,14 +17,16 @@ permissions:
   pull-requests: read
   actions: read
   checks: write
+  statuses: write
 concurrency:
   group: dco-certification
   queue: max
   cancel-in-progress: false
 jobs:
   certify:
+    if: (github.event_name != 'pull_request_target' || (github.event.pull_request.draft == false && github.actor != 'dependabot[bot]')) && (github.event_name != 'workflow_run' || github.event.workflow_run.event == 'pull_request')
     runs-on: ubuntu-24.04
     timeout-minutes: 15
     steps:
       - name: Certify original PR commits
-        uses: paintedwolf-ai/dco-checker@d07f07c5df395ea5a625a0ae1fdaf08beffefec8
+        uses: paintedwolf-ai/dco-checker@7a0e11d8cf7d46d946bd151b99c234cc71431eef
