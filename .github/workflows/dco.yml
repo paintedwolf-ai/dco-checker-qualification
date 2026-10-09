@@ -28,5 +28,11 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 15
     steps:
+      - name: Record disposable qualification event
+        run: |
+          python3 - <<'PY_EVENT'
+          import json, os
+          print("DCO_QUALIFICATION_EVENT=" + json.dumps(json.load(open(os.environ["GITHUB_EVENT_PATH"])), sort_keys=True))
+          PY_EVENT
       - name: Certify original PR commits
         uses: paintedwolf-ai/dco-checker@7a0e11d8cf7d46d946bd151b99c234cc71431eef
