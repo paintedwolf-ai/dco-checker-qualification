@@ -1,0 +1,8 @@
+name: CI
+on: [pull_request, merge_group]
+permissions: {}
+jobs:
+  probe:
+    runs-on: ubuntu-24.04
+    steps:
+      - run: "true"
