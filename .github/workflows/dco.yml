@@ -47,4 +47,4 @@ jobs:
               print("DCO_QUALIFICATION_QUEUE=" + json.dumps(inventory, sort_keys=True))
           PY_EVENT
       - name: Certify original PR commits
-        uses: paintedwolf-ai/dco-checker@078de1f268e518b21b4e71e57f7e4ad24c3d5ff3
+        uses: paintedwolf-ai/dco-checker@76373c28e004ca4d2b9728bcbcecf87c4cc262fb
