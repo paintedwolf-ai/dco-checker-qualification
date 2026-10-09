@@ -53,10 +53,8 @@ jobs:
               'target_url':'https://github.com/' + repo + '/actions/runs/' + os.environ['GITHUB_RUN_ID']})
           if os.environ['GITHUB_EVENT_NAME'] == 'merge_group':
               raise SystemExit(0)
-          check = api('check-runs', {'name':'DCO-owned', 'head_sha':sha,
-              'status':'completed', 'conclusion':'success',
-              'external_id':'fixture-admission:' + os.environ['GITHUB_RUN_ID'],
-              'output':{'title':'TEST ONLY: negative queue admission',
-                        'summary':'This is intentionally not DCO certification. A reviewed fixture publisher admits an unsigned original commit only to demonstrate that the real merge-group checker rejects it. Never install this workflow in production.'}})
-          print('Test-only admission check:', check['id'], 'PR:', number)
+          status = api('statuses/' + sha, {'state':'success', 'context':'DCO-owned',
+              'description':'TEST ONLY: unsigned queue admission, not DCO certification',
+              'target_url':'https://github.com/' + repo + '/actions/runs/' + os.environ['GITHUB_RUN_ID'] + '#fixture-negative-admission'})
+          print('TEST ONLY status:', status['id'], 'PR:', number)
           PY
